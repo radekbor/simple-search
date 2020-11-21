@@ -1,6 +1,9 @@
 package test
+import org.slf4j.LoggerFactory
 
 object BloomFilter {
+
+  private val logger = LoggerFactory.getLogger(getClass.getSimpleName)
 
   type Source = { def getLines(): Iterator[String] }
   def build(k: Int, n: Int): Source => BloomFilter = {
@@ -10,12 +13,13 @@ object BloomFilter {
         val data = Array.ofDim[Boolean](k)
 
         def add(item: String): Unit = {
+          logger.debug(s"Going to generate hashes for '$item'")
           val hashes = hashesGenerator.calcHashes(item)
-          println(s"hashes for $item $hashes ")
+          logger.debug(s"Hashes for '$item': $hashes")
           hashes.foreach(hash => data(hash) = true)
         }
 
-        source.getLines().flatMap(_.split(" ")).foreach(add)
+        source.getLines.flatMap(_.split(" ").filter(_.nonEmpty)).foreach(add)
 
         new BloomFilter(data.toVector, hashesGenerator)
       }
