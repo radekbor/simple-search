@@ -6,11 +6,11 @@ object BloomFilter {
   private val logger = LoggerFactory.getLogger(getClass.getSimpleName)
 
   type Source = { def getLines(): Iterator[String] }
-  def build(k: Int, n: Int): Source => BloomFilter = {
-    val hashesGenerator = new HashesGenerator(k, n)
+  def build(bits: Int, hashes: Int): Source => BloomFilter = {
+    val hashesGenerator = new HashesGenerator(bits, hashes)
     source =>
       {
-        val data = Array.ofDim[Boolean](k)
+        val data = Array.ofDim[Boolean](bits)
 
         def add(item: String): Unit = {
           logger.debug(s"Going to generate hashes for '$item'")

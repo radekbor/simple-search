@@ -7,12 +7,12 @@ protected object Rotator {
   }
 }
 
-class HashesGenerator(val k: Int, val n: Int) {
+class HashesGenerator(val m: Int, val k: Int) {
 
   def calcHashes(item: String): Seq[Int] = {
-    Range(0, n)
+    Range(0, k)
       .map(p => Rotator.shift(item, p))
-      .map(str => str.hashCode % k)
+      .map(str => str.hashCode % m)
       .map(Math.abs)
   }
 

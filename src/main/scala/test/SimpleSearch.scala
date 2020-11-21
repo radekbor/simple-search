@@ -10,6 +10,8 @@ object SimpleSearch extends App {
 }
 
 object Program {
+  private val vectorSize = 400000000
+  private val shifts = 5
   import scala.io.StdIn.readLine
 
   case class Index(fileIndexes: List[(String, BloomFilter)])
@@ -35,7 +37,7 @@ object Program {
 
   // TODO: Index all files in the directory
   def index(file: File): Index = {
-    val bloomFilterFactory = BloomFilter.build(23, 5)
+    val bloomFilterFactory = BloomFilter.build(vectorSize, shifts)
     if (file.isDirectory) {
       val l = file
         .listFiles()
