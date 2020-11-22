@@ -54,29 +54,33 @@ object Program {
   def iterate(indexedFiles: Index): Unit = {
     print(s"search> ")
     val searchString = readLine()
+    if (searchString != ":quit") {
+      val message = indexedFiles.fileIndexes
+        .map {
+          case (fileName, bloomFilter) =>
+            val words = Word.fromLine(searchString)
 
-    val message = indexedFiles.fileIndexes
-      .map {
-        case (fileName, bloomFilter) =>
-          val words = searchString.split(" ")
-          val (totalCount, totalSum) = words
-            .map(bloomFilter.isIn)
-            .map {
-              case true  => 100
-              case false => 0
-            }
-            .foldLeft((0, 0)) {
-              case ((count, sum), current) => (count + 1, sum + current)
-            }
+            val (totalCount, totalSum) = words
+              .map(bloomFilter.isIn)
+              .map {
+                case true  => 100
+                case false => 0
+              }
+              .foldLeft((0, 0)) {
+                case ((count, sum), current) => (count + 1, sum + current)
+              }
 
-          (fileName, totalSum / totalCount.toFloat)
-      }
-      .sortBy(_._1)
-      .take(10)
-      .map {
-        case (name, percentage) => s"$name : $percentage%"
-      }
-      .mkString(" ")
-    println(message)
+            (fileName, totalSum / totalCount.toFloat)
+        }
+        .sortBy(_._1)
+        .take(10)
+        .map {
+          case (name, percentage) => s"$name : $percentage%"
+        }
+        .mkString(" ")
+      println(message)
+      iterate(indexedFiles)
+    }
+
   }
 }

@@ -14,7 +14,7 @@ class HashesGeneratorSpec extends AnyWordSpec with Matchers {
       forAll(bits) { numOfBits =>
         forAll(hashes) { numOfHashes =>
           val hashesGenerator = new HashesGenerator(numOfBits, numOfHashes)
-          val result = hashesGenerator.calcHashes("veryLongText")
+          val result = hashesGenerator.calcHashes(Word.fromLine("veryLongText").head)
 
           result should have size numOfHashes
           result.min should be >= 0
@@ -27,10 +27,7 @@ class HashesGeneratorSpec extends AnyWordSpec with Matchers {
     "generate different hashes for different words" in {
       val words = io.Source.fromResource("test_2/shakespeare.txt")
         .getLines()
-        .flatMap(_.split(" "))
-        .filter(_.nonEmpty)
-        .toList
-        .distinct
+        .flatMap(Word.fromLine)
 
       val n = words.size.toDouble
       val m = 10000

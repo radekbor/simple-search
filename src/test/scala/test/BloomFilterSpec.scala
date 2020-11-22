@@ -9,6 +9,8 @@ class BloomFilterSpec extends AnyWordSpec with Matchers {
     def getLines(): Iterator[String] = words.iterator
   }
 
+  implicit def toWord(word: String): Word = Word.fromLine(word).head
+
   "BloomFilter build based on 10 and 3" should {
     val filterFactory = BloomFilter.build(10, 3)
     "return true for added item" in {

@@ -9,9 +9,9 @@ protected object Rotator {
 
 class HashesGenerator(val m: Int, val k: Int) {
 
-  def calcHashes(item: String): Seq[Int] = {
+  def calcHashes(item: Word): Seq[Int] = {
     Range(0, k)
-      .map(p => Rotator.shift(item, p))
+      .map(p => Rotator.shift(item.raw, p))
       .map(str => str.hashCode % m)
       .map(Math.abs)
   }

@@ -12,24 +12,28 @@ object BloomFilter {
       {
         val data = Array.ofDim[Boolean](bits)
 
-        def add(item: String): Unit = {
-          logger.debug(s"Going to generate hashes for '$item'")
+        def add(item: Word): Unit = {
+          logger.debug(s"Going to generate hashes for '${item.raw}'")
           val hashes = hashesGenerator.calcHashes(item)
-          logger.debug(s"Hashes for '$item': $hashes")
+          logger.debug(s"Hashes for '${item.raw}': $hashes")
           hashes.foreach(hash => data(hash) = true)
         }
 
-        source.getLines.flatMap(_.split(" ").filter(_.nonEmpty)).foreach(add)
+        source.getLines
+          .flatMap(Word.fromLine)
+          .foreach(add)
 
         new BloomFilter(data.toVector, hashesGenerator)
       }
   }
+
 }
 
 class BloomFilter(vector: Vector[Boolean], hashesGenerator: HashesGenerator) {
 
-  def isIn(item: String): Boolean = {
-    val hashes = hashesGenerator.calcHashes(item)
+  def isIn(word: Word): Boolean = {
+
+    val hashes = hashesGenerator.calcHashes(word)
     hashes.forall(hash => vector(hash))
   }
 
