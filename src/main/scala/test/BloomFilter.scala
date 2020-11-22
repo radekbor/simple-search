@@ -1,5 +1,6 @@
 package test
 import org.slf4j.LoggerFactory
+import test.BloomFilter.logger
 
 object BloomFilter {
 
@@ -32,6 +33,7 @@ object BloomFilter {
 class BloomFilter(vector: Vector[Boolean], hashesGenerator: HashesGenerator) {
 
   def isIn(word: Word): Boolean = {
+    logger.info(s"Checking word: '${word.raw}'")
 
     val hashes = hashesGenerator.calcHashes(word)
     hashes.forall(hash => vector(hash))

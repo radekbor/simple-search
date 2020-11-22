@@ -1,17 +1,26 @@
 package test
 import java.io.File
 
+import com.typesafe.config.ConfigFactory
+import org.slf4j.LoggerFactory
+import test.BloomFilter.logger
+
 import scala.util.Try
 
 object SimpleSearch extends App {
+  private val logger = LoggerFactory.getLogger(getClass.getSimpleName)
+  val conf = ConfigFactory.load()
+  // TODO we could calculate those values for each of the file independently base on num of unique words,
+  //  but that would require iterating twice and use e.g hyperLogLog to count it efficiently.
+  val vectorSize = conf.getInt("bits")
+  val shifts = conf.getInt("hashes")
+  logger.info(s"bits: $vectorSize hashes: $shifts")
   Program
     .readFile(args)
     .fold(println, file => Program.iterate(Program.index(file)))
 }
 
 object Program {
-  private val vectorSize = 400000000
-  private val shifts = 5
   import scala.io.StdIn.readLine
 
   case class Index(fileIndexes: List[(String, BloomFilter)])
@@ -37,13 +46,15 @@ object Program {
 
   // TODO: Index all files in the directory
   def index(file: File): Index = {
-    val bloomFilterFactory = BloomFilter.build(vectorSize, shifts)
+    val bloomFilterFactory =
+      BloomFilter.build(SimpleSearch.vectorSize, SimpleSearch.shifts)
     if (file.isDirectory) {
       val l = file
         .listFiles()
         .map(
           file => (file.getName, bloomFilterFactory(io.Source.fromFile(file)))
         )
+      println(s"${l.size} files read in directory ${file.getAbsolutePath}")
       Index(l.toList)
     } else {
       Index(List())
