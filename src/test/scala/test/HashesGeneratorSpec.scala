@@ -25,17 +25,22 @@ class HashesGeneratorSpec extends AnyWordSpec with Matchers {
     }
 
     "generate different hashes for different words" in {
-      val words = io.Source.fromResource("test_2/plain_unique_words.txt")
+      val words = io.Source.fromResource("test_2/shakespeare.txt")
         .getLines()
         .flatMap(_.split(" "))
         .filter(_.nonEmpty)
         .toList
         .distinct
 
-      val hashesGenerator = new HashesGenerator(4000, 23)
+      val n = words.size.toDouble
+      val m = 10000
+      val k = 8
+      val hashesGenerator = new HashesGenerator(m, k)
 
       val hashes = words.map(hashesGenerator.calcHashes)
 
+      val p = Math.pow(1 - Math.exp(-k * n / m), k)
+      println(f"probability that this won't work $p%1.14f")
       hashes.distinct should have size words.size
 
     }
